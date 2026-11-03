@@ -7,6 +7,25 @@
   var tallyScriptPromise;
   document.documentElement.classList.add("js-enabled");
 
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if ("IntersectionObserver" in window && !prefersReducedMotion) {
+    var revealObserver = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    }, {
+      rootMargin: "0px 0px -6% 0px",
+      threshold: 0.04
+    });
+
+    document.querySelectorAll("main > section:not(.hero):not(.page-hero)").forEach(function (section) {
+      section.classList.add("scroll-reveal");
+      revealObserver.observe(section);
+    });
+  }
+
   function savedInterests() {
     try {
       var saved = sessionStorage.getItem(interestsKey);
@@ -167,6 +186,76 @@
   window.addEventListener("scroll", updateHeaderState, { passive: true });
   updateHeaderState();
 
+  var routeIdeasTrack = document.getElementById("route-ideas-track");
+  if (routeIdeasTrack) {
+    var routeIdeasControls = document.querySelector(".route-ideas-controls");
+    var routeIdeasPrevious = document.querySelector(".route-ideas-prev");
+    var routeIdeasNext = document.querySelector(".route-ideas-next");
+
+    function updateRouteIdeasControls(scrollPosition) {
+      var maxScroll = routeIdeasTrack.scrollWidth - routeIdeasTrack.clientWidth;
+      var position = typeof scrollPosition === "number" ? scrollPosition : routeIdeasTrack.scrollLeft;
+      routeIdeasPrevious.disabled = position <= 1;
+      routeIdeasNext.disabled = position >= maxScroll - 1;
+    }
+
+    function scrollRouteIdeas(direction) {
+      var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var maxScroll = routeIdeasTrack.scrollWidth - routeIdeasTrack.clientWidth;
+      var current = routeIdeasTrack.scrollLeft;
+      var trackLeft = routeIdeasTrack.getBoundingClientRect().left;
+      var ideas = Array.prototype.slice.call(routeIdeasTrack.querySelectorAll(".route-idea"));
+      var ideaStarts = Array.prototype.map.call(
+        ideas,
+        function (idea) {
+          return idea.getBoundingClientRect().left - trackLeft + current;
+        }
+      );
+      var target = direction > 0 ? maxScroll : 0;
+      var targetIndex = direction > 0 ? ideas.length - 1 : 0;
+      var alignmentTolerance = 8;
+
+      if (direction > 0) {
+        for (var i = 0; i < ideaStarts.length; i++) {
+          if (ideaStarts[i] > current + alignmentTolerance && ideaStarts[i] < maxScroll) {
+            target = ideaStarts[i];
+            targetIndex = i;
+            break;
+          }
+        }
+      } else {
+        for (var j = ideaStarts.length - 1; j >= 0; j--) {
+          if (ideaStarts[j] < current - alignmentTolerance) {
+            target = ideaStarts[j];
+            targetIndex = j;
+            break;
+          }
+        }
+      }
+
+      if (!reducedMotion && ideas[targetIndex]) {
+        ideas.forEach(function (idea) {
+          idea.classList.remove("is-sliding-next", "is-sliding-previous");
+        });
+        ideas[targetIndex].classList.add(direction > 0 ? "is-sliding-next" : "is-sliding-previous");
+        void ideas[targetIndex].offsetWidth;
+      }
+
+      routeIdeasTrack.scrollBy({
+        left: target - current,
+        behavior: reducedMotion ? "auto" : "smooth"
+      });
+      updateRouteIdeasControls(target);
+    }
+
+    routeIdeasPrevious.addEventListener("click", function () { scrollRouteIdeas(-1); });
+    routeIdeasNext.addEventListener("click", function () { scrollRouteIdeas(1); });
+    routeIdeasTrack.addEventListener("scroll", updateRouteIdeasControls, { passive: true });
+    window.addEventListener("resize", updateRouteIdeasControls);
+    routeIdeasControls.hidden = false;
+    updateRouteIdeasControls();
+  }
+
   var video = document.getElementById("hero-video");
   var videoButton = document.querySelector("[data-video-toggle]");
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -216,29 +305,89 @@
     if (!sky) return;
     W = sky.width = window.innerWidth; H = sky.height = window.innerHeight;
     stars = [];
-    for (var i = 0, n = Math.round(W * H / 9000); i < n; i++) {
-      stars.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.3 + .4, a: Math.random() * .5 + .35, s: Math.random() * 4 + 1, p: Math.random() * 6 });
+    for (var i = 0, n = Math.round(W * H / 7000); i < n; i++) {
+      stars.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.1 + .7, a: Math.random() * .35 + .58, s: Math.random() * 4 + 1, p: Math.random() * 6 });
     }
   }
   function drawSky(ts) {
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#fff7e6";
-    stars.forEach(function (s) {
-      ctx.globalAlpha = reduceMotion ? s.a : s.a * (.75 + .25 * Math.sin(ts / 1400 + s.p));
-      ctx.fillRect(s.x, s.y, s.r, s.r);
+    if (root.getAttribute("data-theme") === "dark") {
+      var moonX = W * 0.84;
+      var moonY = H * 0.2;
+      var moonRadius = Math.min(42, W * 0.08);
+      var moon = ctx.createRadialGradient(
+        moonX - moonRadius * 0.3,
+        moonY - moonRadius * 0.35,
+        moonRadius * 0.08,
+        moonX,
+        moonY,
+        moonRadius
+      );
+      moon.addColorStop(0, "#fff9e8");
+      moon.addColorStop(0.72, "#f1dfb2");
+      moon.addColorStop(1, "#c8b783");
+      ctx.globalAlpha = 1;
+      ctx.shadowColor = "rgba(255, 238, 190, 0.48)";
+      ctx.shadowBlur = moonRadius * 0.8;
+      ctx.fillStyle = moon;
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "rgba(130, 116, 82, 0.13)";
+      ctx.beginPath();
+      ctx.arc(moonX - moonRadius * 0.28, moonY - moonRadius * 0.08, moonRadius * 0.13, 0, Math.PI * 2);
+      ctx.arc(moonX + moonRadius * 0.32, moonY + moonRadius * 0.3, moonRadius * 0.09, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#fffaf0";
+      stars.forEach(function (s) {
+        ctx.globalAlpha = reduceMotion ? s.a : s.a * (.85 + .15 * Math.sin(ts / 1400 + s.p));
+        ctx.fillRect(s.x, s.y, s.r, s.r);
+      });
+      return;
+    }
+
+    var sunX = W * 0.16;
+    var sunY = H * 0.2;
+    var sunRadius = Math.min(35, W * 0.065);
+    var sunlight = ctx.createRadialGradient(sunX, sunY, sunRadius * 0.15, sunX, sunY, sunRadius * 2.8);
+    sunlight.addColorStop(0, "rgba(255, 218, 151, 0.42)");
+    sunlight.addColorStop(0.45, "rgba(255, 218, 151, 0.16)");
+    sunlight.addColorStop(1, "rgba(255, 218, 151, 0)");
+    ctx.fillStyle = sunlight;
+    ctx.fillRect(sunX - sunRadius * 2.8, sunY - sunRadius * 2.8, sunRadius * 5.6, sunRadius * 5.6);
+    ctx.fillStyle = "rgba(255, 226, 174, 0.6)";
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, sunRadius * 0.42, 0, Math.PI * 2);
+    ctx.fill();
+
+    [0.38, 0.62, 0.82].forEach(function (height, index) {
+      var cloudWidth = Math.min(180, W * 0.22);
+      var cloudX = ((W * (0.32 + index * 0.34) + ts * (0.004 + index * 0.001)) % (W + cloudWidth)) - cloudWidth / 2;
+      var cloudY = H * height;
+      var cloudGradient = ctx.createLinearGradient(0, cloudY - 18, 0, cloudY + 18);
+      cloudGradient.addColorStop(0, "rgba(255, 255, 250, 0)");
+      cloudGradient.addColorStop(0.5, "rgba(255, 255, 250, 0.32)");
+      cloudGradient.addColorStop(1, "rgba(255, 255, 250, 0)");
+      ctx.fillStyle = cloudGradient;
+      ctx.beginPath();
+      ctx.ellipse(cloudX, cloudY, cloudWidth, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
     });
   }
   function tick(ts) {
     var dt = Math.min((ts - lastTs) / 1000, .1); lastTs = ts;
-    stars.forEach(function (s) { s.x -= s.s * dt; if (s.x < 0) s.x += W; });
+    if (root.getAttribute("data-theme") === "dark") {
+      stars.forEach(function (s) { s.x -= s.s * dt; if (s.x < 0) s.x += W; });
+    }
     drawSky(ts);
     raf = window.requestAnimationFrame(tick);
   }
   function syncSky() {
     if (!ctx) return;
     window.cancelAnimationFrame(raf);
-    if (root.getAttribute("data-theme") !== "dark") return;
-    makeStars();
+    if (root.getAttribute("data-theme") === "dark") makeStars();
+    else stars = [];
     if (reduceMotion) { drawSky(0); return; }
     lastTs = performance.now(); raf = window.requestAnimationFrame(tick);
   }
@@ -263,9 +412,46 @@
   var journal = document.querySelector(".journal3d");
   if (journal) {
     var jt = journal.querySelector(".jtoggle");
-    function setJournal(open) { journal.classList.toggle("is-open", open); jt.setAttribute("aria-expanded", String(open)); }
+    var journalPanels = Array.prototype.slice.call(journal.querySelectorAll(".jpage-panel"));
+    var journalPrevious = journal.querySelector(".jpage-prev");
+    var journalNext = journal.querySelector(".jpage-next");
+    var journalCount = journal.querySelector(".jpage-count");
+    var currentJournalPage = 0;
+    journalPanels.forEach(function (panel, index) {
+      panel.setAttribute("aria-hidden", String(index !== currentJournalPage));
+    });
+
+    function setJournal(open) {
+      journal.classList.toggle("is-open", open);
+      jt.setAttribute("aria-expanded", String(open));
+      jt.setAttribute("aria-label", open ? "Close the field journal" : "Open the field journal");
+    }
+
+    function showJournalPage(index, direction) {
+      if (index < 0 || index >= journalPanels.length || index === currentJournalPage) return;
+
+      journalPanels[currentJournalPage].classList.remove("is-active");
+      journalPanels[currentJournalPage].setAttribute("aria-hidden", "true");
+      currentJournalPage = index;
+      journalPanels[currentJournalPage].classList.add("is-active");
+      journalPanels[currentJournalPage].setAttribute("aria-hidden", "false");
+      journal.setAttribute("data-page-direction", direction);
+      journalCount.textContent =
+        ("0" + (currentJournalPage + 1)).slice(-2) +
+        " / " +
+        ("0" + journalPanels.length).slice(-2);
+      journalPrevious.disabled = currentJournalPage === 0;
+      journalNext.disabled = currentJournalPage === journalPanels.length - 1;
+    }
+
     jt.addEventListener("click", function () { setJournal(!journal.classList.contains("is-open")); });
     journal.querySelector(".jclose").addEventListener("click", function () { setJournal(false); jt.focus(); });
+    journalPrevious.addEventListener("click", function () {
+      showJournalPage(currentJournalPage - 1, "previous");
+    });
+    journalNext.addEventListener("click", function () {
+      showJournalPage(currentJournalPage + 1, "next");
+    });
   }
 
   /* ---- trip planner: validate on blur, send via WhatsApp / Tally ---- */
