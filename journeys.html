@@ -67,41 +67,76 @@
             <h2 id="route-notes-title">One country.<br />More than one rhythm.</h2>
             <p>Pair landscapes, coast and local experiences in ways that feel right for you. These are ideas to explore together, not fixed routes.</p>
           </div>
-          <ol class="route-ideas">
-            <li class="route-idea">
-              <div class="route-idea-image">
-                <img src="images/journey-wildlife.jpg" alt="Wildlife on Tanzania's open plains" width="1000" height="667" loading="lazy" />
-                <span class="route-idea-number" aria-hidden="true">01</span>
-              </div>
-              <div class="route-idea-copy">
-                <p class="route-idea-label">A journey idea</p>
-                <h3>Wildlife &amp; coast</h3>
-                <p>Pair time in the northern circuit with a slower finish by the Indian Ocean.</p>
-              </div>
-            </li>
-            <li class="route-idea">
-              <div class="route-idea-image">
-                <img src="images/journey-mountains.jpg" alt="A mountain landscape in northern Tanzania" width="1000" height="667" loading="lazy" />
-                <span class="route-idea-number" aria-hidden="true">02</span>
-              </div>
-              <div class="route-idea-copy">
-                <p class="route-idea-label">A journey idea</p>
-                <h3>Mountain &amp; island</h3>
-                <p>Bring highland landscapes and coastal time into the same planning conversation.</p>
-              </div>
-            </li>
-            <li class="route-idea">
-              <div class="route-idea-image">
-                <img src="images/journey-culture.jpg" alt="Colourful produce at a local market" width="1000" height="667" loading="lazy" />
-                <span class="route-idea-number" aria-hidden="true">03</span>
-              </div>
-              <div class="route-idea-copy">
-                <p class="route-idea-label">A journey idea</p>
-                <h3>Place &amp; culture</h3>
-                <p>Make room for markets, heritage and local life alongside the landscapes.</p>
-              </div>
-            </li>
-          </ol>
+          <div class="route-ideas-controls" role="group" aria-label="Journey ideas navigation" hidden>
+            <p class="route-ideas-hint">Scroll to explore more journey ideas</p>
+            <div>
+              <button class="route-ideas-prev" type="button" aria-label="Scroll to previous journey ideas" aria-controls="route-ideas-track" disabled>←</button>
+              <button class="route-ideas-next" type="button" aria-label="Scroll to more journey ideas" aria-controls="route-ideas-track">→</button>
+            </div>
+          </div>
+          <div class="route-ideas-viewport" id="route-ideas-track" role="region" aria-label="Scrollable journey ideas" tabindex="0">
+            <ol class="route-ideas">
+              <li class="route-idea">
+                <div class="route-idea-image">
+                  <img src="images/wildlife.jpg" alt="Wildlife in Tanzania" width="1000" height="667" loading="eager" />
+                  <span class="route-idea-number" aria-hidden="true">01</span>
+                </div>
+                <div class="route-idea-copy">
+                  <p class="route-idea-label">A journey idea</p>
+                  <h3>Wildlife &amp; coast</h3>
+                  <p>Pair time in the northern circuit with a slower finish by the Indian Ocean.</p>
+                  <p class="route-idea-country">Tanzania</p>
+                </div>
+              </li>
+              <li class="route-idea">
+                <div class="route-idea-image">
+                  <img src="images/kilimanjaro.jpg" alt="Mount Kilimanjaro in Tanzania" width="1000" height="667" loading="eager" />
+                  <span class="route-idea-number" aria-hidden="true">02</span>
+                </div>
+                <div class="route-idea-copy">
+                  <p class="route-idea-label">A journey idea</p>
+                  <h3>Mountain &amp; island</h3>
+                  <p>Bring highland landscapes and coastal time into the same planning conversation.</p>
+                  <p class="route-idea-country">Tanzania</p>
+                </div>
+              </li>
+              <li class="route-idea">
+                <div class="route-idea-image">
+                  <img src="images/culture.jpg" alt="Culture and local life in Tanzania" width="1000" height="667" loading="eager" />
+                  <span class="route-idea-number" aria-hidden="true">03</span>
+                </div>
+                <div class="route-idea-copy">
+                  <p class="route-idea-label">A journey idea</p>
+                  <h3>Place &amp; culture</h3>
+                  <p>Make room for markets, heritage and local life alongside the landscapes.</p>
+                  <p class="route-idea-country">Tanzania</p>
+                </div>
+              </li>
+              <li class="route-idea route-idea-upcoming" aria-label="Future journey idea">
+                <div class="route-idea-image route-idea-image-empty">
+                  <span aria-hidden="true">+</span>
+                  <p>New places on the horizon</p>
+                </div>
+                <div class="route-idea-upcoming-copy">
+                  <p class="route-idea-label">A new chapter</p>
+                  <h3>More journeys ahead</h3>
+                  <p>New places and experiences will find their way into the journal.</p>
+                  <span class="route-idea-coming-soon">Coming soon</span>
+                </div>
+              </li>
+              <li class="route-idea route-idea-upcoming" aria-label="Future journey idea">
+                <div class="route-idea-image route-idea-image-empty">
+                  <span aria-hidden="true">+</span>
+                  <p>Space for discovery</p>
+                </div>
+                <div class="route-idea-upcoming-copy">
+                  <h3>What comes next?</h3>
+                  <p>Keep an eye out for more routes as our story grows.</p>
+                  <span class="route-idea-coming-soon">Coming soon</span>
+                </div>
+              </li>
+            </ol>
+          </div>
         </div>
       </section>
 
