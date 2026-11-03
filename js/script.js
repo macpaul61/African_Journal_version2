@@ -301,10 +301,12 @@
   var sky = document.querySelector(".night-sky");
   var ctx = sky && sky.getContext && sky.getContext("2d");
   var stars = [], raf = 0, lastTs = 0, W = 0, H = 0;
+  var finePointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   function makeStars() {
     if (!sky) return;
     W = sky.width = window.innerWidth; H = sky.height = window.innerHeight;
     stars = [];
+    if (root.getAttribute("data-theme") !== "dark") return;
     for (var i = 0, n = Math.round(W * H / 7000); i < n; i++) {
       stars.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.1 + .7, a: Math.random() * .35 + .58, s: Math.random() * 4 + 1, p: Math.random() * 6 });
     }
@@ -375,6 +377,16 @@
       ctx.fill();
     });
   }
+  if (finePointer && !reduceMotion) {
+    window.addEventListener("pointermove", function (event) {
+      root.style.setProperty("--pointer-glow-x", event.clientX + "px");
+      root.style.setProperty("--pointer-glow-y", event.clientY + "px");
+    }, { passive: true });
+    window.addEventListener("pointerleave", function () {
+      root.style.setProperty("--pointer-glow-x", "-500px");
+      root.style.setProperty("--pointer-glow-y", "-500px");
+    }, { passive: true });
+  }
   function tick(ts) {
     var dt = Math.min((ts - lastTs) / 1000, .1); lastTs = ts;
     if (root.getAttribute("data-theme") === "dark") {
@@ -386,8 +398,7 @@
   function syncSky() {
     if (!ctx) return;
     window.cancelAnimationFrame(raf);
-    if (root.getAttribute("data-theme") === "dark") makeStars();
-    else stars = [];
+    makeStars();
     if (reduceMotion) { drawSky(0); return; }
     lastTs = performance.now(); raf = window.requestAnimationFrame(tick);
   }
@@ -404,7 +415,7 @@
     try { localStorage.setItem("afj-theme", next); } catch (e) {}
     applyTheme(next);
   });
-  window.addEventListener("resize", function () { if (root.getAttribute("data-theme") === "dark") syncSky(); });
+  window.addEventListener("resize", syncSky);
   document.addEventListener("visibilitychange", function () { if (document.hidden) window.cancelAnimationFrame(raf); else syncSky(); });
   applyTheme(root.getAttribute("data-theme") || "light");
 
