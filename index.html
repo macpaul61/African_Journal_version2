@@ -54,20 +54,67 @@
             <a class="button button-gold" href="journeys.html">Explore journeys</a>
             <a class="text-link text-link-light" href="#plan">Plan your trip</a>
           </div>
-        </div>
-        
-        <div class="hero-journal">
-          <div class="journal3d">
-            <div class="jbook">
-              <div class="jpage"><h2>Where to first?</h2>
-                <a href="journeys.html#wildlife">Wildlife and the northern circuit</a><a href="journeys.html#mountains">Mountains and highlands</a><a href="journeys.html#culture">Culture and heritage</a><a href="journeys.html#coast">Coast and islands</a></div>
-              <div class="jcover">
-                <div class="jface jfront"><img src="images/afj-emblem.png" alt="" width="554" height="616" /><strong>African Journal</strong><span>Field journal, Tanzania</span>
-                  <button class="jtoggle" type="button" aria-expanded="false" aria-label="Open the field journal"></button></div>
-                <div class="jface jback"><p>Tanzania is where our journal begins. Pick a page and we will plan the trip around it.</p><button class="jclose" type="button">Close the journal</button></div>
+          <div class="hero-journal">
+            <div class="journal3d">
+              <div class="jbook">
+                <div class="jpage" aria-label="Field journal pages">
+                  <div class="jpage-panels" aria-live="polite">
+                    <article class="jpage-panel is-active" aria-hidden="false">
+                      <span class="jpage-kicker">01 / WILDLIFE</span>
+                      <h2>Open plains</h2>
+                      <p>Shape a safari around Tanzania’s wildlife and wide horizons.</p>
+                      <a href="journeys.html#wildlife">Explore safari ideas <span aria-hidden="true">↗</span></a>
+                    </article>
+                    <article class="jpage-panel" aria-hidden="true">
+                      <span class="jpage-kicker">02 / MOUNTAINS</span>
+                      <h2>Higher ground</h2>
+                      <p>Find a trail and a pace that feel right for you.</p>
+                      <a href="journeys.html#mountains">Explore mountain ideas <span aria-hidden="true">↗</span></a>
+                    </article>
+                    <article class="jpage-panel" aria-hidden="true">
+                      <span class="jpage-kicker">03 / CULTURE</span>
+                      <h2>Living stories</h2>
+                      <p>Make room for local flavours, heritage and everyday life.</p>
+                      <a href="journeys.html#culture">Explore culture ideas <span aria-hidden="true">↗</span></a>
+                    </article>
+                    <article class="jpage-panel" aria-hidden="true">
+                      <span class="jpage-kicker">04 / THE COAST</span>
+                      <h2>Island time</h2>
+                      <p>Pair inland discovery with the Swahili coast or Zanzibar.</p>
+                      <a href="journeys.html#coast">Explore coast ideas <span aria-hidden="true">↗</span></a>
+                    </article>
+                    <article class="jpage-panel" aria-hidden="true">
+                      <span class="jpage-kicker">05 / YOUR JOURNEY</span>
+                      <h2>Made for you</h2>
+                      <p>Tell us what calls you. We’ll shape the details together.</p>
+                      <a href="contact.html">Start planning <span aria-hidden="true">↗</span></a>
+                    </article>
+                  </div>
+                  <div class="jpage-controls">
+                    <button class="jpage-prev" type="button" aria-label="Previous journal page" disabled>←</button>
+                    <span class="jpage-count" aria-live="polite">01 / 05</span>
+                    <button class="jpage-next" type="button" aria-label="Next journal page">→</button>
+                  </div>
+                </div>
+                <div class="jcover">
+                  <div class="jface jfront"><img src="images/afj-emblem.png" alt="" width="554" height="616" /><strong>African Journal</strong><span>Field journal, Tanzania</span>
+                    <button class="jtoggle" type="button" aria-expanded="false" aria-label="Open the field journal"></button></div>
+                  <div class="jface jback">
+                    <span class="jback-kicker">A FIELD GUIDE</span>
+                    <p>Tanzania is our first chapter. Turn a page to find your starting point.</p>
+                    <button class="jclose" type="button">Close journal</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+        <div class="hero-bottom-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" focusable="false">
+            <circle cx="20" cy="20" r="13.5" />
+            <path d="M20 2.5v5M20 32.5v5M2.5 20h5M32.5 20h5M20 11l2.8 6.2L29 20l-6.2 2.8L20 29l-2.8-6.2L11 20l6.2-2.8L20 11Z" />
+            <circle cx="20" cy="20" r="1.5" />
+          </svg>
         </div>
         <button class="video-toggle" type="button" data-video-toggle aria-pressed="false" aria-label="Pause background film">
           <span class="video-toggle-icon" aria-hidden="true">Ⅱ</span><span data-video-label>Pause film</span>
