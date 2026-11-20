@@ -301,7 +301,6 @@
   var sky = document.querySelector(".night-sky");
   var ctx = sky && sky.getContext && sky.getContext("2d");
   var stars = [], raf = 0, lastTs = 0, W = 0, H = 0;
-  var finePointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   function makeStars() {
     if (!sky) return;
     W = sky.width = window.innerWidth; H = sky.height = window.innerHeight;
@@ -313,79 +312,12 @@
   }
   function drawSky(ts) {
     ctx.clearRect(0, 0, W, H);
-    if (root.getAttribute("data-theme") === "dark") {
-      var moonX = W * 0.84;
-      var moonY = H * 0.2;
-      var moonRadius = Math.min(42, W * 0.08);
-      var moon = ctx.createRadialGradient(
-        moonX - moonRadius * 0.3,
-        moonY - moonRadius * 0.35,
-        moonRadius * 0.08,
-        moonX,
-        moonY,
-        moonRadius
-      );
-      moon.addColorStop(0, "#fff9e8");
-      moon.addColorStop(0.72, "#f1dfb2");
-      moon.addColorStop(1, "#c8b783");
-      ctx.globalAlpha = 1;
-      ctx.shadowColor = "rgba(255, 238, 190, 0.48)";
-      ctx.shadowBlur = moonRadius * 0.8;
-      ctx.fillStyle = moon;
-      ctx.beginPath();
-      ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = "rgba(130, 116, 82, 0.13)";
-      ctx.beginPath();
-      ctx.arc(moonX - moonRadius * 0.28, moonY - moonRadius * 0.08, moonRadius * 0.13, 0, Math.PI * 2);
-      ctx.arc(moonX + moonRadius * 0.32, moonY + moonRadius * 0.3, moonRadius * 0.09, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#fffaf0";
-      stars.forEach(function (s) {
-        ctx.globalAlpha = reduceMotion ? s.a : s.a * (.85 + .15 * Math.sin(ts / 1400 + s.p));
-        ctx.fillRect(s.x, s.y, s.r, s.r);
-      });
-      return;
-    }
-
-    var sunX = W * 0.16;
-    var sunY = H * 0.2;
-    var sunRadius = Math.min(35, W * 0.065);
-    var sunlight = ctx.createRadialGradient(sunX, sunY, sunRadius * 0.15, sunX, sunY, sunRadius * 2.8);
-    sunlight.addColorStop(0, "rgba(255, 218, 151, 0.42)");
-    sunlight.addColorStop(0.45, "rgba(255, 218, 151, 0.16)");
-    sunlight.addColorStop(1, "rgba(255, 218, 151, 0)");
-    ctx.fillStyle = sunlight;
-    ctx.fillRect(sunX - sunRadius * 2.8, sunY - sunRadius * 2.8, sunRadius * 5.6, sunRadius * 5.6);
-    ctx.fillStyle = "rgba(255, 226, 174, 0.6)";
-    ctx.beginPath();
-    ctx.arc(sunX, sunY, sunRadius * 0.42, 0, Math.PI * 2);
-    ctx.fill();
-
-    [0.38, 0.62, 0.82].forEach(function (height, index) {
-      var cloudWidth = Math.min(180, W * 0.22);
-      var cloudX = ((W * (0.32 + index * 0.34) + ts * (0.004 + index * 0.001)) % (W + cloudWidth)) - cloudWidth / 2;
-      var cloudY = H * height;
-      var cloudGradient = ctx.createLinearGradient(0, cloudY - 18, 0, cloudY + 18);
-      cloudGradient.addColorStop(0, "rgba(255, 255, 250, 0)");
-      cloudGradient.addColorStop(0.5, "rgba(255, 255, 250, 0.32)");
-      cloudGradient.addColorStop(1, "rgba(255, 255, 250, 0)");
-      ctx.fillStyle = cloudGradient;
-      ctx.beginPath();
-      ctx.ellipse(cloudX, cloudY, cloudWidth, 18, 0, 0, Math.PI * 2);
-      ctx.fill();
+    if (root.getAttribute("data-theme") !== "dark") return;
+    ctx.fillStyle = "#fffaf0";
+    stars.forEach(function (s) {
+      ctx.globalAlpha = reduceMotion ? s.a : s.a * (.85 + .15 * Math.sin(ts / 1400 + s.p));
+      ctx.fillRect(s.x, s.y, s.r, s.r);
     });
-  }
-  if (finePointer && !reduceMotion) {
-    window.addEventListener("pointermove", function (event) {
-      root.style.setProperty("--pointer-glow-x", event.clientX + "px");
-      root.style.setProperty("--pointer-glow-y", event.clientY + "px");
-    }, { passive: true });
-    window.addEventListener("pointerleave", function () {
-      root.style.setProperty("--pointer-glow-x", "-500px");
-      root.style.setProperty("--pointer-glow-y", "-500px");
-    }, { passive: true });
   }
   function tick(ts) {
     var dt = Math.min((ts - lastTs) / 1000, .1); lastTs = ts;
@@ -399,7 +331,10 @@
     if (!ctx) return;
     window.cancelAnimationFrame(raf);
     makeStars();
-    if (reduceMotion) { drawSky(0); return; }
+    if (root.getAttribute("data-theme") !== "dark" || reduceMotion) {
+      drawSky(0);
+      return;
+    }
     lastTs = performance.now(); raf = window.requestAnimationFrame(tick);
   }
   function applyTheme(t) {
